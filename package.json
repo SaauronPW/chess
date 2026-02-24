@@ -1,0 +1,15 @@
+{
+  "name": "chess",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Roguelite chess core (TypeScript)",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vitest": "^1.0.0"
+  }
+}
