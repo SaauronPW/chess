@@ -1,8 +1,5 @@
 name: Unpack schach_inferno.zip
 
-permissions:
-  contents: write
-
 on:
   workflow_dispatch:
 
@@ -10,42 +7,41 @@ jobs:
   unpack:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Ensure unzip installed
+      - name: Ensure unzip is available
         run: sudo apt-get update && sudo apt-get install -y unzip
 
-      - name: Verify zip exists
+      - name: Unpack schach_inferno.zip
         run: |
-          if [ ! -f "schach_inferno.zip" ]; then
-            echo "schach_inferno.zip not found in repo root" >&2
-            exit 1
+          if [ -f schach_inferno.zip ]; then
+            rm -rf unpacked || true
+            mkdir -p unpacked
+            unzip -o schach_inferno.zip -d unpacked
+            echo "Unpacked schach_inferno.zip to ./unpacked"
+          else
+            echo "schach_inferno.zip not found in repo root" && exit 1
           fi
 
-      - name: Unpack zip into "unpacked/"
-        run: |
-          mkdir -p unpacked
-          unzip -o schach_inferno.zip -d unpacked
-          echo "Unpacked to unpacked/"
-          ls -la unpacked | sed -n '1,200p'
-
-      - name: Create branch and commit unpacked files
+      - name: Commit unpacked files to branch
         env:
-          GIT_AUTHOR_NAME: github-actions
-          GIT_AUTHOR_EMAIL: github-actions@github.com
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "${GIT_AUTHOR_NAME}"
-          git config user.email "${GIT_AUTHOR_EMAIL}"
-          git checkout -b unpack/schach_inferno
-          # copy contents of unpacked into repo root
-          cp -a unpacked/. .
-          git add -A
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          BRANCH="unpack/schach_inferno"
+          # create or switch to the branch
+          if git rev-parse --verify "$BRANCH" >/dev/null 2>&1; then
+            git checkout "$BRANCH"
           else
-            git commit -m "chore: unpack schach_inferno.zip to unpack/schach_inferno"
-            git push -u origin HEAD
+            git checkout -b "$BRANCH"
+          fi
+          git add -A unpacked
+          if git commit -m "Unpack schach_inferno.zip via workflow"; then
+            git push --set-upstream origin "$BRANCH"
+          else
+            echo "No changes to commit"
           fi
