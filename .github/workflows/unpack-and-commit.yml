@@ -1,0 +1,63 @@
+name: Unpack and Commit schach_inferno
+
+on:
+  workflow_dispatch:
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up unzip
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip || true
+
+      - name: Unpack schach_inferno.zip
+        run: |
+          if [ ! -f schach_inferno.zip ]; then
+            echo "schach_inferno.zip not found in repository root";
+            exit 1;
+          fi
+          rm -rf unpacked || true
+          mkdir -p unpacked
+          unzip -o schach_inferno.zip -d unpacked
+
+      - name: Create branch and commit unpacked files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BRANCH_NAME="unpack/schach_inferno-full"
+          git checkout -b "$BRANCH_NAME"
+          # Move files from unpacked root into repo root if needed
+          # We commit the unpacked directory content as-is under unpacked/
+          git add unpacked
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Unpack schach_inferno.zip into unpacked/"
+            git push --set-upstream origin "$BRANCH_NAME"
+          fi
+
+      - name: Trigger CI workflow on branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Trigger the existing CI workflow (ci.yml) on the new branch
+          REPO_FULL="${GITHUB_REPOSITORY}"
+          WORKFLOW_FILE="ci.yml"
+          TARGET_REF="unpack/schach_inferno-full"
+
+          echo "Triggering CI workflow ${WORKFLOW_FILE} for ref ${TARGET_REF}"
+          curl -s -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            https://api.github.com/repos/${REPO_FULL}/actions/workflows/${WORKFLOW_FILE}/dispatches \
+            -d '{"ref": "${TARGET_REF}"}'
+
+      - name: Show dispatched status
+        run: |
+          echo "Unpack and dispatch steps completed. Check Actions tab for runs."
