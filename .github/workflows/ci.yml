@@ -1,1 +1,58 @@
-name: CI\n\non: workflow_dispatch\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Check out code\n        uses: actions/checkout@v2\n\n      - name: Set up Node.js\n        uses: actions/setup-node@v2\n        with:\n          node-version: '18'\n\n      - name: Cache npm dependencies\n        uses: actions/cache@v2\n        with:\n          path: ~/.npm\n          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}\n\n      - name: Install dependencies\n        run: npm ci\n\n      - name: Unpack schach_inferno.zip if present\n        run: |\n          if [ -f schach_inferno.zip ]; then\n            mkdir -p unpacked;\n            unzip schach_inferno.zip -d unpacked;\n          fi\n\n      - name: Run build if present\n        run: |\n          if [ -f package.json ]; then\n            npm run build || true;\n          fi\n\n      - name: Run tests\n        run: npm run test || true\n\n      - name: Save test output artifacts\n        if: failure()\n        run: |\n          mkdir -p test-output;\n          mv test-results.xml test-output/ || true\n          mv test-output-* test-output/ || true\n\n      - name: Upload test output\n        uses: actions/upload-artifact@v2\n        with:\n          name: test-output\n          path: test-output/
+name: CI
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json','**/package.json') }}
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --prefer-offline --no-audit --progress=false
+          fi
+
+      - name: Unpack schach_inferno.zip if present
+        run: |
+          if [ -f schach_inferno.zip ]; then
+            mkdir -p unpacked;
+            unzip schach_inferno.zip -d unpacked;
+          fi
+
+      - name: Run build if present
+        run: |
+          if [ -f package.json ]; then
+            npm run build || true;
+          fi
+
+      - name: Run tests
+        run: npm run test || true
+
+      - name: Save test output artifacts
+        if: failure()
+        run: |
+          mkdir -p test-output;
+          mv test-results.xml test-output/ || true
+          mv test-output-* test-output/ || true
+
+      - name: Upload test output
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-output
+          path: test-output/
