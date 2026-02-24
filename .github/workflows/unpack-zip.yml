@@ -1,0 +1,51 @@
+name: Unpack schach_inferno.zip
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure unzip installed
+        run: sudo apt-get update && sudo apt-get install -y unzip
+
+      - name: Verify zip exists
+        run: |
+          if [ ! -f "schach_inferno.zip" ]; then
+            echo "schach_inferno.zip not found in repo root" >&2
+            exit 1
+          fi
+
+      - name: Unpack zip into "unpacked/"
+        run: |
+          mkdir -p unpacked
+          unzip -o schach_inferno.zip -d unpacked
+          echo "Unpacked to unpacked/"
+          ls -la unpacked | sed -n '1,200p'
+
+      - name: Create branch and commit unpacked files
+        env:
+          GIT_AUTHOR_NAME: github-actions
+          GIT_AUTHOR_EMAIL: github-actions@github.com
+        run: |
+          git config user.name "${GIT_AUTHOR_NAME}"
+          git config user.email "${GIT_AUTHOR_EMAIL}"
+          git checkout -b unpack/schach_inferno
+          # copy contents of unpacked into repo root
+          cp -a unpacked/. .
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: unpack schach_inferno.zip to unpack/schach_inferno"
+            git push -u origin HEAD
+          fi
