@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCHACH INFERNO</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<!-- ═══════════════ HUD ═══════════════ -->
+<div id="globalHud">
+  <div class="hud-group">
+    <div class="hud-stat">
+      <span>☠</span>
+      <div class="hud-lives" id="hudLives"></div>
+    </div>
+    <div class="hud-stat">
+      <span>💰</span>
+      <span class="hud-val" id="hudGold">0</span>
+      <span class="hud-lbl">Gold</span>
+    </div>
+    <div class="hud-stat">
+      <span>⭐</span>
+      <span class="hud-val" id="hudScore">0</span>
+      <span class="hud-lbl">Punkte</span>
+    </div>
+  </div>
+
+  <div class="hud-chapter" id="hudChapter">Run</div>
+
+  <div class="hud-group">
+    <button class="btn btn-dark btn-sm" id="btnToMap">🗺 Karte</button>
+    <button class="btn btn-dark btn-sm" id="btnToShop">🛒 Shop</button>
+    <button class="btn btn-dark btn-sm" id="btnCamReset">📷</button>
+    <button id="devSkipBtn" onclick="devSkip()">⚡ SKIP</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Modal Overlay -->
+<div id="overlay">
+  <div class="modal">
+    <span class="modal-icon" id="modalIcon" style="display:none"></span>
+    <h2 id="modalTitle"></h2>
+    <p  id="modalText"></p>
+    <div class="modal-btns" id="modalBtns"></div>
+  </div>
+</div>
+
+<!-- ═════════════ TITLE ═════════════ -->
+<div class="screen active" id="titleScreen">
+  <div class="title-logo">
+    <span class="title-chess-piece">♟</span>
+    <h1 style="font-size:clamp(38px,7vw,88px);color:var(--candle);text-shadow:0 0 30px rgba(232,160,48,.6);letter-spacing:6px;">
+      SCHACH INFERNO
+    </h1>
+    <div class="title-sub">Roguelike · Inscryption-Style · 3D Board</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+    <button class="btn btn-gold" id="btnStart">⚔ Neuer Run</button>
+    <button class="btn btn-dark btn-sm" id="btnHow">📜 Wie es funktioniert</button>
+  </div>
+  <div style="margin-top:44px;font-family:'Special Elite',cursive;font-size:10px;color:var(--ink-faint);letter-spacing:5px;text-align:center;">
+    SCHACH · ROGUELIKE · ÜBERLEBE
+  </div>
+</div>
+
+<!-- ══════════════ MAP ══════════════ -->
+<div class="screen" id="mapScreen">
+  <div class="map-inner">
+    <div style="text-align:center;margin-bottom:18px;">
+      <h2 style="color:var(--candle);letter-spacing:5px;font-size:clamp(22px,4vw,38px);">— DER PFAD —</h2>
+    </div>
+    <div class="map-legend" id="mapLegend"></div>
+    <div class="map-nodes"  id="mapNodes"></div>
+  </div>
+</div>
+
+<!-- ═════════════ BATTLE ═════════════ -->
+<div class="screen" id="battleScreen">
+  <div class="battle-layout">
+
+    <!-- Left side: enemy info -->
+    <div class="b-side">
+      <div class="panel">
+        <h3>⚔ Gegner</h3>
+        <div class="char-portrait" id="enemyPortrait"></div>
+        <div class="char-name"  id="enemyName">—</div>
+        <div class="char-title" id="enemyTitle">—</div>
+        <div class="small" id="enemyFlavor" style="margin-top:5px;font-style:italic;font-size:10px;"></div>
+      </div>
+      <div class="panel">
+        <h3>📋 Info</h3>
+        <div class="small" id="encounterText"></div>
+        <hr class="wood">
+        <div class="row" style="gap:6px;margin-bottom:6px;">
+          <button class="btn btn-dark btn-sm" id="btnAIMove">🤖 KI-Zug</button>
+          <button class="btn btn-dark btn-sm" id="btnUndo">↩ Rückgängig</button>
+        </div>
+        <div class="small" style="color:var(--ink-faint);font-size:10px;line-height:1.8;">
+          <kbd>A</kbd><kbd>D</kbd> Drehen &nbsp;
+          <kbd>W</kbd><kbd>S</kbd> Neigen<br>
+          Mausrad: Zoom &nbsp;·&nbsp; 📷 Kamera reset
+        </div>
+      </div>
+      <!-- Amazon badge (hidden unless active) -->
+      <div class="amazon-badge" id="amazonBadge" style="display:none;">
+        ⚜ <strong style="color:var(--purple2)">Amazone aktiv</strong><br>
+        Dame bewegt sich wie Dame + Springer
+      </div>
+    </div>
+
+    <!-- Center: 3D board -->
+    <div class="b-center">
+      <div class="board-wrap">
+        <div id="threeRoot"></div>
+      </div>
+      <div class="board-status">
+        <div class="bs-item" id="battleLeft">Wähle eine Figur</div>
+        <div class="turn-badge turn-white" id="battleTurn">Weiß</div>
+        <div class="bs-item" id="battleRight">—</div>
+      </div>
+    </div>
+
+    <!-- Right side: player + score -->
+    <div class="b-side">
+      <div class="panel">
+        <h3>👤 Du</h3>
+        <div class="char-portrait" id="playerPortrait"></div>
+        <div class="char-name">Der Wanderer</div>
+        <div class="char-title">Suchender der Wahrheit</div>
+      </div>
+      <div class="panel">
+        <h3>⭐ Punkte</h3>
+        <div class="score-total" id="battleScoreDisplay">0</div>
+        <div class="score-feed"  id="scoreFeed"></div>
+      </div>
+      <div class="panel">
+        <h3>🔮 Relikte</h3>
+        <div id="relicList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════ SHOP ══════════════ -->
+<div class="screen" id="shopScreen">
+  <div class="shop-inner">
+    <div class="shop-header">
+      <h2>🕯 Der Händler</h2>
+      <p class="small" style="color:var(--ink-dim)">Kauf weise, Reisender. Jedes Item hat seinen Preis.</p>
+      <div class="shop-gold">💰 <span id="shopGoldDisplay">0</span> Gold</div>
+    </div>
+    <div class="shop-cats">
+      <button class="shop-cat-btn active" data-cat="all">Alle</button>
+      <button class="shop-cat-btn" data-cat="relic">Relikte</button>
+      <button class="shop-cat-btn" data-cat="special">Special</button>
+      <button class="shop-cat-btn" data-cat="upgrade">Upgrades</button>
+    </div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <div class="row" style="justify-content:center;gap:12px;">
+      <button class="btn btn-dark" id="btnRerollShop">🎲 Neu würfeln (3💰)</button>
+      <button class="btn btn-gold" id="btnLeaveShop">➡ Weiter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ REWARD ════════════ -->
+<div class="screen" id="rewardScreen">
+  <div class="panel" style="max-width:780px;width:94vw;margin:0 16px;">
+    <h3>🎁 Belohnung</h3>
+    <div class="small" id="rewardText"></div>
+    <div class="choices" id="rewardChoices"></div>
+    <div class="row" style="justify-content:center;margin-top:16px;">
+      <button class="btn btn-gold" id="btnContinue">▶ Weiter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ DEATH ═════════════ -->
+<div class="screen" id="deathScreen">
+  <div style="text-align:center;max-width:480px;padding:0 20px;">
+    <div style="font-size:90px;filter:drop-shadow(0 0 28px rgba(192,32,16,.75));">☠</div>
+    <h1 style="margin:10px 0;color:var(--blood2);letter-spacing:7px;font-size:clamp(28px,5vw,52px);">
+      GAME OVER
+    </h1>
+    <p id="deathReason" style="color:var(--ink-dim);line-height:1.75;margin-bottom:14px;"></p>
+    <div class="death-score" id="deathStats"></div>
+    <div class="row" style="justify-content:center;gap:12px;">
+      <button class="btn btn-gold" id="btnRestart">🔄 Neuer Run</button>
+      <button class="btn btn-dark btn-sm" id="btnMenu">↩ Menü</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

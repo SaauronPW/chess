@@ -1,0 +1,302 @@
+/* ═══════════════════════════════════════
+   SCHACH INFERNO — Styles
+   Inscryption · Dark Wood · Candle Light
+   ═══════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Creepster&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root {
+  --wood-dark:  #130b04;
+  --wood-mid:   #2a1808;
+  --wood-plank: #352010;
+  --candle:     #e8a030;
+  --candle2:    #c06010;
+  --candle-dim: #7a4a10;
+  --ink:        #d4c89a;
+  --ink-dim:    #8a7a5a;
+  --ink-faint:  #5a4a2a;
+  --blood:      #8a1a0a;
+  --blood2:     #c02010;
+  --card-face:  #1a1006;
+  --card-border:#5a3a10;
+  --green:      #3a8a20;
+  --green2:     #5ac830;
+  --blue:       #2050a0;
+  --blue2:      #4080e0;
+  --purple:     #6030a0;
+  --purple2:    #a060e0;
+  --gold-glow:  0 0 18px rgba(232,160,48,.5);
+}
+
+/* ── Reset ──────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--wood-dark);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(232,160,48,.12) 0%, transparent 55%),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,.07) 60px, rgba(0,0,0,.07) 61px);
+  color: var(--ink);
+  font-family: 'IM Fell English', serif;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Film grain overlay */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: .35;
+}
+
+/* ── Typography ──────────────────────── */
+h1, h2    { font-family: 'Creepster', cursive; }
+h3        { font-family: 'Special Elite', cursive; font-size: 10px; color: var(--candle);
+            letter-spacing: 3px; text-transform: uppercase;
+            margin-bottom: 8px; border-bottom: 1px solid var(--ink-faint); padding-bottom: 5px; }
+
+/* ── Screens ─────────────────────────── */
+.screen { display: none; width: 100%; min-height: 100vh; }
+.screen.active { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+/* ── Buttons ──────────────────────────── */
+.btn {
+  font-family: 'Special Elite', cursive;
+  font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+  padding: 11px 26px; border: none; cursor: pointer; transition: all .18s;
+  clip-path: polygon(4px 0%, calc(100% - 4px) 0%, 100% 4px, 100% calc(100% - 4px),
+             calc(100% - 4px) 100%, 4px 100%, 0% calc(100% - 4px), 0% 4px);
+}
+.btn-gold  { background: linear-gradient(160deg, #6a3a08, #c07010, #6a3a08); color: #f5e8b0;
+             border: 1px solid #8a5010; box-shadow: 0 4px 15px rgba(0,0,0,.6); }
+.btn-gold:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.7), 0 0 14px rgba(192,112,16,.3); }
+.btn-dark  { background: var(--card-face); color: var(--ink); border: 1px solid var(--card-border); }
+.btn-dark:hover { border-color: var(--candle); color: var(--candle); }
+.btn-red   { background: linear-gradient(160deg,#4a0808,#c02010,#4a0808); color: #f5c8b0; border: 1px solid #6a1010; }
+.btn-sm    { padding: 6px 14px; font-size: 11px; letter-spacing: 2px; }
+
+/* ── Panel ───────────────────────────── */
+.panel {
+  background: var(--wood-plank);
+  border: 1px solid var(--card-border);
+  border-radius: 2px; padding: 12px;
+  box-shadow: inset 0 1px 0 rgba(255,200,80,.04), 0 4px 12px rgba(0,0,0,.5);
+}
+
+/* ── HUD ─────────────────────────────── */
+#globalHud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 800;
+  display: none; align-items: center; justify-content: space-between;
+  padding: 6px 18px;
+  background: linear-gradient(180deg, rgba(10,5,0,.96) 0%, rgba(10,5,0,.72) 100%);
+  border-bottom: 1px solid var(--card-border);
+  backdrop-filter: blur(4px);
+}
+#globalHud.visible { display: flex; }
+.hud-group  { display: flex; align-items: center; gap: 14px; }
+.hud-stat   { display: flex; align-items: center; gap: 5px; font-family: 'Special Elite', cursive; font-size: 13px; }
+.hud-val    { color: var(--candle); font-size: 15px; text-shadow: var(--gold-glow); }
+.hud-lbl    { color: var(--ink-faint); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.hud-chapter{ font-family: 'Creepster', cursive; font-size: 16px; color: var(--ink-dim); letter-spacing: 2px; }
+.hud-chapter span { color: var(--candle); }
+.hud-lives  { display: flex; gap: 4px; }
+.life-dot   { width: 14px; height: 14px; border-radius: 50%; background: var(--blood2);
+              box-shadow: 0 0 6px rgba(192,32,16,.7); }
+.life-dot.revive { background: var(--candle); box-shadow: 0 0 6px rgba(232,160,48,.7); }
+#devSkipBtn {
+  background: rgba(255,80,20,.15); border: 1px dashed rgba(255,80,20,.5);
+  color: rgba(255,80,20,.8); font-family: 'Special Elite', cursive;
+  font-size: 9px; letter-spacing: 1px; padding: 3px 8px; cursor: pointer;
+  border-radius: 1px; text-transform: uppercase;
+  transition: background .2s;
+}
+#devSkipBtn:hover { background: rgba(255,80,20,.3); }
+
+/* ── Toast ───────────────────────────── */
+#toast {
+  position: fixed; top: 52px; left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: var(--wood-plank); border: 2px solid var(--candle2); border-radius: 2px;
+  padding: 8px 22px; font-family: 'Special Elite', cursive; font-size: 12px;
+  color: var(--candle); z-index: 10001; letter-spacing: 2px; text-align: center;
+  pointer-events: none; max-width: 88vw;
+  transition: transform .35s cubic-bezier(.175,.885,.32,1.275);
+}
+#toast.show      { transform: translateX(-50%) translateY(0); }
+#toast.t-good    { border-color: var(--green2); color: var(--green2); }
+#toast.t-bad     { border-color: var(--blood2); color: var(--blood2); }
+#toast.t-special { border-color: var(--purple2); color: var(--purple2); }
+
+/* ── Overlay / Modal ─────────────────── */
+#overlay { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 900;
+           display: none; align-items: center; justify-content: center; }
+#overlay.active { display: flex; }
+.modal {
+  background: var(--wood-mid); border: 2px solid var(--card-border); border-radius: 2px;
+  padding: 24px 28px; max-width: 560px; width: 92%; text-align: center;
+}
+.modal h2       { color: var(--candle); font-size: 22px; margin-bottom: 10px; }
+.modal p        { color: var(--ink-dim); margin-bottom: 16px; line-height: 1.75;
+                  font-size: 13px; white-space: pre-line; }
+.modal-btns     { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ── Title Screen ────────────────────── */
+.title-logo        { text-align: center; margin-bottom: 34px; }
+.title-chess-piece { font-size: 72px; display: block;
+                     filter: drop-shadow(0 0 14px rgba(232,160,48,.58));
+                     animation: floatPiece 3s ease-in-out infinite; }
+@keyframes floatPiece { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.title-sub { font-family: 'Special Elite', cursive; font-size: 11px; color: var(--ink-dim);
+             letter-spacing: 7px; margin-top: 10px; text-transform: uppercase; }
+
+/* ── Map Screen ──────────────────────── */
+#mapScreen.active { justify-content: flex-start; padding-top: 66px; overflow-y: auto; }
+.map-inner   { width: 100%; max-width: 1000px; padding: 0 16px; }
+.map-legend  { display: flex; gap: 12px; flex-wrap: wrap; font-family: 'Special Elite', cursive;
+               font-size: 11px; color: var(--ink-dim); margin-bottom: 12px; }
+.map-nodes   { display: grid; grid-template-columns: repeat(5, minmax(120px,1fr)); gap: 10px; }
+
+.node {
+  background: var(--card-face); border: 2px solid var(--card-border);
+  padding: 14px 10px; text-align: center; cursor: pointer;
+  transition: all .2s; min-height: 88px;
+  clip-path: polygon(3px 0%, calc(100% - 3px) 0%, 100% 3px, 100% calc(100% - 3px),
+             calc(100% - 3px) 100%, 3px 100%, 0% calc(100% - 3px), 0% 3px);
+}
+.node:hover:not(.locked):not(.done) { transform: translateY(-3px); border-color: var(--candle);
+  box-shadow: 0 6px 18px rgba(0,0,0,.5); }
+.node.locked  { opacity: .28; cursor: not-allowed; filter: grayscale(.8); }
+.node.done    { opacity: .42; cursor: default; }
+.node.current { border-color: var(--candle); animation: nodeGlow 2s ease-in-out infinite; }
+@keyframes nodeGlow { 0%,100%{box-shadow:0 0 8px rgba(232,160,48,.3)} 50%{box-shadow:0 0 22px rgba(232,160,48,.7)} }
+.node.type-boss   .node-icon { filter: drop-shadow(0 0 8px rgba(192,32,16,.6)); }
+.node.type-event  { border-color: var(--purple); }
+.node-icon  { font-size: 28px; display: block; margin-bottom: 6px; }
+.node-lbl   { font-family: 'Special Elite', cursive; font-size: 11px; color: var(--candle); letter-spacing: 1px; }
+.node-desc  { font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-top: 4px; }
+
+/* ── Battle Screen ───────────────────── */
+#battleScreen.active { justify-content: flex-start; }
+.battle-layout {
+  width: 100%; height: calc(100vh - 48px);
+  padding: 8px 10px; display: flex; align-items: flex-start;
+  justify-content: center; gap: 10px; overflow: hidden;
+}
+.b-side   { width: 215px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.b-center { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.board-wrap { flex: 1 1 auto; min-height: 0; width: 100%; display: flex; }
+#threeRoot  { width: 100%; height: 100%; min-height: 280px; overflow: hidden; }
+#threeRoot canvas { width: 100% !important; height: 100% !important; display: block; }
+
+.board-status {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px; background: var(--wood-plank); border: 1px solid var(--card-border);
+  font-family: 'Special Elite', cursive; font-size: 11px; margin-top: 4px;
+}
+.bs-item   { color: var(--ink-dim); }
+.turn-badge{ padding: 2px 10px; font-weight: 700; }
+.turn-white{ background: rgba(58,170,32,.2); color: #5ac830; border: 1px solid rgba(58,170,32,.4); }
+.turn-black{ background: rgba(192,32,16,.2); color: #e05030; border: 1px solid rgba(192,32,16,.4); }
+
+/* Character portrait */
+.char-portrait {
+  width: 100%; aspect-ratio: 1/1; max-height: 130px; overflow: hidden;
+  border: 2px solid var(--card-border); background: var(--card-face);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 7px;
+}
+.char-portrait svg { width: 100%; height: 100%; }
+.char-name  { font-family: 'Creepster', cursive; font-size: 16px; color: var(--candle);
+              text-align: center; text-shadow: 0 0 10px rgba(232,160,48,.4); line-height: 1.2; }
+.char-title { font-family: 'Special Elite', cursive; font-size: 9px; color: var(--ink-faint);
+              text-align: center; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+
+/* Score feed */
+.score-feed      { max-height: 90px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--card-border) transparent; }
+.score-entry     { display: flex; justify-content: space-between; align-items: center;
+                   padding: 2px 0; font-family: 'Special Elite', cursive; font-size: 10px;
+                   border-bottom: 1px solid rgba(90,58,16,.2); color: var(--ink-dim); }
+.score-entry .pts{ font-weight: bold; }
+.s-good    .pts  { color: var(--green2); }
+.s-special .pts  { color: var(--purple2); }
+.s-bad     .pts  { color: var(--blood2); }
+.score-total     { font-family: 'Special Elite', cursive; font-size: 20px; color: var(--candle);
+                   text-align: center; text-shadow: var(--gold-glow); margin-bottom: 6px; }
+
+/* Amazon info badge */
+.amazon-badge {
+  background: rgba(96,48,160,.2); border: 1px solid var(--purple);
+  padding: 6px 8px; font-family: 'Special Elite', cursive; font-size: 10px;
+  color: var(--purple2); letter-spacing: 1px; line-height: 1.5;
+}
+
+/* ── Shop Screen ──────────────────────── */
+#shopScreen.active { justify-content: flex-start; padding-top: 66px; overflow-y: auto; }
+.shop-inner        { width: 100%; max-width: 880px; padding: 0 16px 40px; }
+.shop-header       { text-align: center; margin-bottom: 20px; }
+.shop-header h2    { font-family: 'Creepster', cursive; font-size: 36px; color: var(--candle);
+                     text-shadow: 0 0 20px rgba(232,160,48,.5); }
+.shop-gold         { font-family: 'Special Elite', cursive; font-size: 17px; color: var(--candle); margin-top: 8px; }
+
+.shop-cats         { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+.shop-cat-btn      { font-family: 'Special Elite', cursive; font-size: 10px; letter-spacing: 2px;
+                     text-transform: uppercase; padding: 5px 14px;
+                     border: 1px solid var(--card-border); background: var(--card-face);
+                     color: var(--ink-dim); cursor: pointer; transition: all .2s; }
+.shop-cat-btn.active, .shop-cat-btn:hover { border-color: var(--candle); color: var(--candle); }
+
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(178px,1fr)); gap: 12px; margin-bottom: 18px; }
+.shop-card {
+  background: var(--card-face); border: 2px solid var(--card-border);
+  padding: 15px 12px; text-align: center; cursor: pointer;
+  transition: all .2s; position: relative; overflow: hidden;
+  clip-path: polygon(4px 0%, calc(100% - 4px) 0%, 100% 4px, 100% calc(100% - 4px),
+             calc(100% - 4px) 100%, 4px 100%, 0% calc(100% - 4px), 0% 4px);
+}
+/* Rarity top stripe */
+.shop-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.r-common::before     { background: #555; }
+.r-uncommon::before   { background: var(--green); }
+.r-rare::before       { background: var(--blue); }
+.r-legendary::before  { background: linear-gradient(90deg, var(--purple), var(--candle), var(--purple)); }
+
+.shop-card:hover:not(.sold) { transform: translateY(-4px); border-color: var(--candle);
+                               box-shadow: 0 8px 22px rgba(0,0,0,.6); }
+.shop-card.sold { opacity: .32; cursor: default; }
+.c-rarity  { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px; }
+.c-icon    { font-size: 36px; margin-bottom: 8px; }
+.c-name    { font-family: 'Special Elite', cursive; font-size: 12px; color: var(--ink); margin-bottom: 5px; letter-spacing: 1px; }
+.c-desc    { font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 10px; }
+.c-hint    { font-size: 9px; color: var(--ink-faint); font-style: italic; margin-bottom: 8px; }
+.c-price   { font-family: 'Special Elite', cursive; font-size: 14px; color: var(--candle); }
+.sold-stamp{ font-family: 'Special Elite', cursive; font-size: 10px; color: #444; letter-spacing: 2px; }
+
+/* ── Reward / Event ───────────────────── */
+#rewardScreen.active  { justify-content: flex-start; padding-top: 66px; overflow-y: auto; }
+.choices     { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+.choice {
+  width: min(220px,92vw); background: var(--card-face); border: 2px solid var(--card-border);
+  padding: 14px; cursor: pointer; transition: all .2s;
+  clip-path: polygon(3px 0%, calc(100% - 3px) 0%, 100% 3px, 100% calc(100% - 3px),
+             calc(100% - 3px) 100%, 3px 100%, 0% calc(100% - 3px), 0% 3px);
+}
+.choice:hover     { border-color: var(--candle); transform: translateY(-3px); }
+.choice.selected  { border-color: var(--candle); background: rgba(232,160,48,.07); }
+.c-title { font-family: 'Special Elite', cursive; color: var(--candle); letter-spacing: 1px; font-size: 13px; }
+.c-desc  { font-size: 11px; color: var(--ink-dim); margin-top: 6px; line-height: 1.6; }
+
+/* ── Death Screen ─────────────────────── */
+.death-score { font-family: 'Special Elite', cursive; font-size: 13px; color: var(--ink-faint); margin-bottom: 20px; line-height: 1.8; }
+
+/* ── Relics list ──────────────────────── */
+.relic-row  { margin-bottom: 7px; }
+.relic-icon { font-size: 14px; }
+.relic-name { font-family: 'Special Elite', cursive; color: var(--candle); font-size: 11px; }
+.relic-desc { font-size: 10px; color: var(--ink-faint); line-height: 1.5; margin-top: 1px; }
+
+/* ── Misc utils ───────────────────────── */
+.small     { font-size: 12px; color: var(--ink-dim); line-height: 1.75; }
+.row       { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+hr.wood    { border: 0; border-top: 1px solid var(--ink-faint); margin: 7px 0; }
+kbd        { font-family: monospace; font-size: 11px; background: #0d0702;
+             border: 1px solid rgba(90,58,16,.8); padding: 1px 5px; border-radius: 3px; color: var(--ink); }
